@@ -64,7 +64,7 @@ Fyrir frétt skal sækja eftir [`slug`](https://en.wikipedia.org/wiki/Clean_URL#
 
 ### Gögn
 
-Nota skal Prisma til að vinna með gögnin. Setja skal upp _seed_ fyrir grunngögn, búa þarf til nokkra höfunda (3-4) og að minnsta kosti 11 fréttir með bull gögnum þar sem höfundar eru tengdir.
+Nota skal Prisma til að vinna með gögnin. Setja skal upp [_seed_ fyrir grunngögn](https://www.prisma.io/docs/orm/prisma-migrate/workflows/seeding), búa þarf til nokkra höfunda (3-4) og að minnsta kosti 11 fréttir með bull gögnum þar sem höfundar eru tengdir.
 
 Þegar fyrirspurnir eru gerðar í gagnagrunn skal eingöngu nota Prisma client.
 
