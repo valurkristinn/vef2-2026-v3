@@ -110,7 +110,7 @@ Setja skal upp `eslint` með TypeScript og strict type checking (`"strict": true
 
 ### GitHub og hýsing
 
-Verkefnið skal keyra á [Render](https://render.com/) eða álíka þjónustu sem styður PostgreSQL og Node.js. Einnig er hægt að setja upp postgres á [Neon](https://neon.com/) eða álíka sértækum postgres hýsingum.
+Verkefnið skal keyra á [Render](https://render.com/) eða álíka þjónustu sem styður PostgreSQL og Node.js. Einnig er hægt að setja upp postgres á [Neon](https://neon.com/) eða álíka sértækum postgres hýsingum. 
 
 Lesa skal `DATABASE_URL` úr environment variable fyrir tengingu við gagnagrunn.
 
