@@ -6,6 +6,7 @@ import { authorsApi } from "./api/authors.api.js";
 const app = new Hono();
 
 import 'dotenv/config'; // Make sure this is the first line
+import { newsApi } from "./api/news.api.js";
 
 app.get("/", (c) => {
   return c.json({
@@ -23,6 +24,7 @@ app.get("/", (c) => {
 });
 
 app.route('/authors', authorsApi)
+app.route('/news', newsApi)
 
 serve(
   {
