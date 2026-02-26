@@ -25,6 +25,6 @@ model News {
  excerpt   String
  content   String
  published Boolean @default(false)
- author    Author @relation(fields: [authorId], references: [id])
+ author    Author @relation(fields: [authorId], references: [id], onDelete: Cascade)
  authorId  Int
 }

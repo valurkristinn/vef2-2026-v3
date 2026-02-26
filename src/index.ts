@@ -1,3 +1,4 @@
+import "dotenv/config";
 import { serve } from "@hono/node-server";
 import { Hono } from "hono";
 
@@ -5,26 +6,63 @@ import { authorsApi } from "./api/authors.api.js";
 
 const app = new Hono();
 
-import 'dotenv/config'; // Make sure this is the first line
 import { newsApi } from "./api/news.api.js";
 
 app.get("/", (c) => {
   return c.json({
     "/authors": [
       {
-        method: "get",
-        description: "returns list of authors",
+        method: "GET",
+        description: "returns paginated list of authors",
       },
       {
-        method: "post",
+        method: "POST",
         description: "create a new author",
+      },
+    ],
+    "/authors/:id": [
+      {
+        method: "GET",
+        description: "returns author by id",
+      },
+      {
+        method: "DELETE",
+        description: "deletes author by id",
+      },
+      {
+        method: "PUT",
+        description: "updates author by id",
+      },
+    ],
+    "/news": [
+      {
+        method: "GET",
+        description: "returns paginated list of news",
+      },
+      {
+        method: "POST",
+        description: "create a new news",
+      },
+    ],
+    "/news/:slug": [
+      {
+        method: "GET",
+        description: "returns news by slug",
+      },
+      {
+        method: "DELETE",
+        description: "deletes news by slug",
+      },
+      {
+        method: "PUT",
+        description: "updates news by slug",
       },
     ],
   });
 });
 
-app.route('/authors', authorsApi)
-app.route('/news', newsApi)
+app.route("/authors", authorsApi);
+app.route("/news", newsApi);
 
 serve(
   {

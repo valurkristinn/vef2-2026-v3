@@ -4,18 +4,20 @@ import { filterXSS } from "xss";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/client";
 
 import { prisma } from "./prisma.js";
-import {pagingSchema, postAuthorSchema, idSchema } from "./zod.js"
+import { pagingSchema, postAuthorSchema, idSchema } from "./zod.js";
 
 export const authorsApi = new Hono();
-
-
 
 authorsApi.get("/", zValidator("query", pagingSchema), async (c) => {
   const limit = c.req.valid("query").limit;
   const offset = c.req.valid("query").offset;
 
   try {
-    const authors = await prisma.author.findMany({ take: limit, skip: offset });
+    const authors = await prisma.author.findMany({ 
+      take: limit, 
+      skip: offset,
+      orderBy: {id: 'asc'}
+    });
 
     const count = await prisma.author.count();
     const response = {
@@ -31,8 +33,6 @@ authorsApi.get("/", zValidator("query", pagingSchema), async (c) => {
     return c.json(null, 500);
   }
 });
-
-
 
 authorsApi.post("/", zValidator("json", postAuthorSchema), async (c) => {
   const data = c.req.valid("json");
@@ -56,8 +56,6 @@ authorsApi.post("/", zValidator("json", postAuthorSchema), async (c) => {
     return c.json({ error: "Internal Server Error" }, 500);
   }
 });
-
-
 
 authorsApi.get("/:id", zValidator("param", idSchema), async (c) => {
   const id = c.req.valid("param").id;
@@ -109,7 +107,6 @@ authorsApi.delete("/:id", zValidator("param", idSchema), async (c) => {
   const id = c.req.valid("param").id;
 
   try {
-    await prisma.news.deleteMany({ where: { authorId: id } });
     await prisma.author.delete({ where: { id: id } });
 
     return c.body(null, 204);
