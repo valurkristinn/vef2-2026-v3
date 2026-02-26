@@ -1,6 +1,6 @@
 import assert from 'node:assert';
 import { describe, it } from 'node:test';
-import { postNewsSchema } from './news.api.js';
+import { postNewsSchema } from './zod.js';
 
 describe('Validation Schemas', () => {
   describe('postNewsSchema', () => {

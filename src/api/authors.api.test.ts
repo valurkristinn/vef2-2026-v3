@@ -1,6 +1,6 @@
 import assert from "node:assert";
 import { describe, it } from "node:test";
-import { postAuthorSchema } from "./authors.api.js"; 
+import { postAuthorSchema } from "./zod.js"; 
 
 describe("Validation Schemas", () => {
   describe("postAuthorSchema", () => {

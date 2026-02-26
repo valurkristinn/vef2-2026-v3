@@ -1,17 +1,14 @@
 import { Hono } from "hono";
-import * as z from "zod";
 import { zValidator } from "@hono/zod-validator";
 import { filterXSS } from "xss";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/client";
 
 import { prisma } from "./prisma.js";
+import {pagingSchema, postAuthorSchema, idSchema } from "./zod.js"
 
 export const authorsApi = new Hono();
 
-const pagingSchema = z.object({
-  limit: z.coerce.number().min(1).max(100).optional().default(10),
-  offset: z.coerce.number().min(0).max(1000).optional().default(0),
-});
+
 
 authorsApi.get("/", zValidator("query", pagingSchema), async (c) => {
   const limit = c.req.valid("query").limit;
@@ -35,10 +32,7 @@ authorsApi.get("/", zValidator("query", pagingSchema), async (c) => {
   }
 });
 
-export const postAuthorSchema = z.object({
-  email: z.email().max(32),
-  name: z.string().min(3).max(32),
-});
+
 
 authorsApi.post("/", zValidator("json", postAuthorSchema), async (c) => {
   const data = c.req.valid("json");
@@ -63,9 +57,7 @@ authorsApi.post("/", zValidator("json", postAuthorSchema), async (c) => {
   }
 });
 
-const idSchema = z.object({
-  id: z.coerce.number().int().min(0),
-});
+
 
 authorsApi.get("/:id", zValidator("param", idSchema), async (c) => {
   const id = c.req.valid("param").id;

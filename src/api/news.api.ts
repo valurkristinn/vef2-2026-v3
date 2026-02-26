@@ -1,17 +1,14 @@
 import { Hono } from "hono";
-import * as z from "zod";
 import { zValidator } from "@hono/zod-validator";
 import { filterXSS } from "xss";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/client";
 
 import { prisma } from "./prisma.js";
+import { pagingSchema, postNewsSchema, slugSchema } from "./zod.js";
 
 export const newsApi = new Hono();
 
-const pagingSchema = z.object({
-  limit: z.coerce.number().min(1).max(100).optional().default(10),
-  offset: z.coerce.number().min(0).max(100).optional().default(0),
-});
+
 
 newsApi.get("/", zValidator("query", pagingSchema), async (c) => {
   const limit = c.req.valid("query").limit;
@@ -38,14 +35,7 @@ newsApi.get("/", zValidator("query", pagingSchema), async (c) => {
   }
 });
 
-export const postNewsSchema = z.object({
-  title: z.string().min(1).max(128),
-  slug: z.string().min(1).max(128).slugify(),
-  excerpt: z.string().min(1).max(256),
-  content: z.string().min(1),
-  authorId: z.number().int().min(0),
-  published: z.boolean().default(false),
-});
+
 
 newsApi.post("/", zValidator("json", postNewsSchema), async (c) => {
   const data = c.req.valid("json");
@@ -80,9 +70,7 @@ newsApi.post("/", zValidator("json", postNewsSchema), async (c) => {
   }
 });
 
-const slugSchema = z.object({
-  slug: z.string().min(1),
-});
+
 
 newsApi.get("/:slug", zValidator("param", slugSchema), async (c) => {
   const slug = c.req.valid("param").slug;
