@@ -10,7 +10,7 @@ export const authorsApi = new Hono();
 
 const pagingSchema = z.object({
   limit: z.coerce.number().min(1).max(100).optional().default(10),
-  offset: z.coerce.number().min(0).max(100).optional().default(0),
+  offset: z.coerce.number().min(0).max(1000).optional().default(0),
 });
 
 authorsApi.get("/", zValidator("query", pagingSchema), async (c) => {

@@ -1,5 +1,5 @@
 import { prisma } from "../src/api/prisma.js";
-
+import type { Author } from "../src/generated/prisma/client.js";
 
 async function upsertAuthor(i: number) {
   await prisma.author.upsert({
@@ -38,7 +38,7 @@ async function main() {
     },
   });
 
-  const authorIds = authors.map((i) => i.id);
+  const authorIds = authors.map((i: Author) => i.id);
 
   for (let i = 0; i < 12; i++) {
     await upsertNews(i, authorIds);
