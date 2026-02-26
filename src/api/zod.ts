@@ -7,7 +7,7 @@ export const pagingSchema = z.object({
 
 export const postAuthorSchema = z.object({
   email: z.email().max(32),
-  name: z.string().min(3).max(32),
+  name: z.string().min(1).max(32),
 });
 
 export const idSchema = z.object({

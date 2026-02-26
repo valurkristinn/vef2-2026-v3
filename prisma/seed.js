@@ -12,7 +12,7 @@ async function upsertAuthor(i) {
 async function upsertNews(i, authorIds) {
     const authorId = authorIds[Math.floor(i / 3)];
     await prisma.news.upsert({
-        where: { id: i },
+        where: { slug: `news-title-${i}` },
         update: {},
         create: {
             title: `News title${i}`,
@@ -24,7 +24,7 @@ async function upsertNews(i, authorIds) {
     });
 }
 async function main() {
-    for (let i = 0; i < 4; i++) {
+    for (let i = 1; i <= 4; i++) {
         await upsertAuthor(i);
     }
     const authors = await prisma.author.findMany({
@@ -33,7 +33,7 @@ async function main() {
         },
     });
     const authorIds = authors.map((i) => i.id);
-    for (let i = 0; i < 12; i++) {
+    for (let i = 1; i <= 12; i++) {
         await upsertNews(i, authorIds);
     }
 }

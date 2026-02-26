@@ -18,7 +18,7 @@ newsApi.get("/", zValidator("query", pagingSchema), async (c) => {
     const news = await prisma.news.findMany({
       take: limit,
       skip: offset,
-      orderBy: {id: 'asc'}
+      orderBy: {id: 'desc'}
     });
 
     const count = await prisma.news.count();

@@ -16,7 +16,7 @@ authorsApi.get("/", zValidator("query", pagingSchema), async (c) => {
     const authors = await prisma.author.findMany({ 
       take: limit, 
       skip: offset,
-      orderBy: {id: 'asc'}
+      orderBy: {id: 'desc'}
     });
 
     const count = await prisma.author.count();

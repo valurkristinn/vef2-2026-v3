@@ -16,8 +16,8 @@ describe("Validation Schemas", () => {
       assert.strictEqual(result.success, false);
     });
 
-    it("should fail if name is too short (less than 3)", () => {
-      const author = { email: "test@example.org", name: "te" };
+    it("should fail if name is empty", () => {
+      const author = { email: "test@example.org", name: "" };
       const result = postAuthorSchema.safeParse(author);
       assert.strictEqual(result.success, false);
     });

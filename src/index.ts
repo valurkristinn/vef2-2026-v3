@@ -3,10 +3,11 @@ import { serve } from "@hono/node-server";
 import { Hono } from "hono";
 
 import { authorsApi } from "./api/authors.api.js";
+import { newsApi } from "./api/news.api.js";
+
 
 const app = new Hono();
 
-import { newsApi } from "./api/news.api.js";
 
 app.get("/", (c) => {
   return c.json({
