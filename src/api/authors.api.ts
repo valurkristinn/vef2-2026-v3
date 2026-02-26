@@ -1,80 +1,134 @@
 import { Hono } from "hono";
+import * as z from "zod";
+import { zValidator } from "@hono/zod-validator";
+import { filterXSS } from "xss";
+import { PrismaClientKnownRequestError } from "@prisma/client/runtime/client";
 
 import { prisma } from "./prisma.js";
-import type { Author } from "../generated/prisma/client.js";
 
 export const authorsApi = new Hono();
 
-// type Author = {
-//   id: string;
-//   name: string;
-// };
-//
-// var authors: Array<Author> = [
-//   {
-//     id: "1",
-//     name: "temp1",
-//   },
-//   {
-//     id: "2",
-//     name: "temp2",
-//   },
-//   {
-//     id: "3",
-//     name: "temp3",
-//   },
-//   {
-//     id: "4",
-//     name: "temp4",
-//   },
-//   {
-//     id: "5",
-//     name: "temp5",
-//   },
-// ];
-
-authorsApi.get("/", async (c) => {
-  const authors = await prisma.author.findMany();
-  return c.json(authors);
+const pagingSchema = z.object({
+  limit: z.coerce.number().min(1).max(100).optional().default(10),
+  offset: z.coerce.number().min(0).max(100).optional().default(0),
 });
 
-authorsApi.post("/", (c) => {
-  prisma.author.create({
-    data: {
-      email: "temp",
-      name: "temp",
-    },
-  });
+authorsApi.get("/", zValidator("query", pagingSchema), async (c) => {
+  const limit = c.req.valid("query").limit;
+  const offset = c.req.valid("query").offset;
 
-  return c.json(null, 200);
+  try {
+    const authors = await prisma.author.findMany({ take: limit, skip: offset });
+
+    const count = await prisma.author.count();
+    const response = {
+      data: authors,
+      paging: {
+        limit: limit,
+        offset: offset,
+        total: count,
+      },
+    };
+    return c.json(response);
+  } catch {
+    return c.json(null, 500);
+  }
 });
 
-authorsApi.get("/:id", async (c) => {
-  const id = Number(c.req.param("id"));
+export const postAuthorSchema = z.object({
+  email: z.email().max(32),
+  name: z.string().min(3).max(32),
+});
+
+authorsApi.post("/", zValidator("json", postAuthorSchema), async (c) => {
+  const data = c.req.valid("json");
+
+  try {
+    const newAuthor = await prisma.author.create({
+      data: {
+        email: filterXSS(data.email),
+        name: filterXSS(data.name),
+      },
+    });
+
+    return c.json(newAuthor, 201);
+  } catch (error: unknown) {
+    if (error instanceof PrismaClientKnownRequestError) {
+      if (error.code === "P2002") {
+        return c.json({ error: "This email is already registered" }, 400);
+      }
+      return c.json({ error: "Invalid data" }, 400);
+    }
+    return c.json({ error: "Internal Server Error" }, 500);
+  }
+});
+
+const idSchema = z.object({
+  id: z.coerce.number().int().min(0),
+});
+
+authorsApi.get("/:id", zValidator("param", idSchema), async (c) => {
+  const id = c.req.valid("param").id;
   try {
     const author = await prisma.author.findUniqueOrThrow({ where: { id: id } });
 
     return c.json(author, 200);
-  } catch (error: any) {
-    if (error.code == "P2025") {
-      return c.json({ error: `no author with the id ${id} found` }, 404);
+  } catch (error: unknown) {
+    if (
+      error instanceof PrismaClientKnownRequestError &&
+      error.code === "P2025"
+    ) {
+      return c.json({ error: `No author with the id ${id} found` }, 404);
     }
-    return c.json({ error: "unknown error" }, 409);
+    return c.json({ error: "Internal Server Error" }, 500);
   }
 });
 
-authorsApi.delete("/:id", async (c) => {
-  const id = Number(c.req.param("id"));
+authorsApi.put(
+  "/:id",
+  zValidator("param", idSchema),
+  zValidator("json", postAuthorSchema),
+  async (c) => {
+    const { id } = c.req.valid("param");
+    const data = c.req.valid("json");
+
+    try {
+      const updated = await prisma.author.update({
+        where: { id },
+        data: {
+          name: filterXSS(data.name),
+          email: filterXSS(data.email),
+        },
+      });
+      return c.json(updated, 200);
+    } catch (error: unknown) {
+      if (error instanceof PrismaClientKnownRequestError) {
+        if (error.code === "P2025") {
+          return c.json({ error: "Author not found" }, 404);
+        }
+        return c.json({ error: "Invalid data" }, 400);
+      }
+      return c.json({ error: "Internal Server Error" }, 500);
+    }
+  },
+);
+
+authorsApi.delete("/:id", zValidator("param", idSchema), async (c) => {
+  const id = c.req.valid("param").id;
 
   try {
+    await prisma.news.deleteMany({ where: { authorId: id } });
     await prisma.author.delete({ where: { id: id } });
 
-    return c.json(204);
-  } catch (error: any) {
-    if (error.code == "P2025") {
-      return c.json({ error: `no author with the id ${id} found` }, 404);
+    return c.body(null, 204);
+  } catch (error: unknown) {
+    if (
+      error instanceof PrismaClientKnownRequestError &&
+      error.code === "P2025"
+    ) {
+      return c.json({ error: `No author with the id ${id} found` }, 404);
     }
 
-    return c.json(null, 500);
+    return c.json({ error: "Internal Server Error" }, 500);
   }
 });
