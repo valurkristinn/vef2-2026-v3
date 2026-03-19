@@ -22,6 +22,7 @@ async function upsertNews(i: number, authorIds: number[]) {
       slug: `news-title-${i}`,
       excerpt: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin magna quam, lobortis id est ut, volutpat pellentesque sapien. Suspendisse non tincidunt nibh. Maecenas id lobortis arcu.",
       content: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer venenatis, neque ut feugiat auctor, risus massa venenatis massa, ac sagittis ipsum magna sagittis libero. Praesent euismod, nisi a facilisis sodales, massa urna consectetur velit, eu maximus arcu quam vel erat. Praesent lacus lorem, tempor in viverra pharetra, malesuada non libero. Vestibulum non lectus dapibus, vehicula justo quis, tristique ante. Nulla ultricies dolor vel dolor viverra dignissim a non mi. Phasellus ut mattis metus. Nulla id mattis mi. Maecenas tempus metus scelerisque metus pretium, eget fringilla felis ornare. Sed laoreet, ipsum eget porttitor volutpat, massa metus bibendum est, vel ornare elit sapien vestibulum enim. Maecenas ornare dui at hendrerit vestibulum. Pellentesque vitae ullamcorper massa, rutrum accumsan dui. ",
+      published: true,
       authorId: authorId,
     },
   });
