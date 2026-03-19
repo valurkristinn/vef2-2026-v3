@@ -13,22 +13,26 @@ async function upsertAuthor(i: number) {
 } 
 
 async function upsertNews(i: number, authorIds: number[]) {
-  const authorId = authorIds[Math.floor(i / 3)];
+  const authorId = authorIds[i%authorIds.length];
   await prisma.news.upsert({
     where: { id: i },
     update: {},
     create: {
-      title: `News title${i}`,
+      title: `News title ${i}`,
       slug: `news-title-${i}`,
-      excerpt: `excerpt of news${i}`,
-      content: `content of news${i}`,
+      excerpt: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin magna quam, lobortis id est ut, volutpat pellentesque sapien. Suspendisse non tincidunt nibh. Maecenas id lobortis arcu.",
+      content: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer venenatis, neque ut feugiat auctor, risus massa venenatis massa, ac sagittis ipsum magna sagittis libero. Praesent euismod, nisi a facilisis sodales, massa urna consectetur velit, eu maximus arcu quam vel erat. Praesent lacus lorem, tempor in viverra pharetra, malesuada non libero. Vestibulum non lectus dapibus, vehicula justo quis, tristique ante. Nulla ultricies dolor vel dolor viverra dignissim a non mi. Phasellus ut mattis metus. Nulla id mattis mi. Maecenas tempus metus scelerisque metus pretium, eget fringilla felis ornare. Sed laoreet, ipsum eget porttitor volutpat, massa metus bibendum est, vel ornare elit sapien vestibulum enim. Maecenas ornare dui at hendrerit vestibulum. Pellentesque vitae ullamcorper massa, rutrum accumsan dui. ",
       authorId: authorId,
     },
   });
 }
 
 async function main() {
-  for (let i = 0; i < 4; i++) {
+  await prisma.news.deleteMany()
+  await prisma.author.deleteMany()
+  
+
+  for (let i = 0; i < 8; i++) {
     await upsertAuthor(i);
   }
 
@@ -40,7 +44,7 @@ async function main() {
 
   const authorIds = authors.map((i: Author) => i.id);
 
-  for (let i = 0; i < 12; i++) {
+  for (let i = 0; i < 24; i++) {
     await upsertNews(i, authorIds);
   }
 }

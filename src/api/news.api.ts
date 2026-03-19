@@ -8,8 +8,6 @@ import { pagingSchema, postNewsSchema, slugSchema } from "./zod.js";
 
 export const newsApi = new Hono();
 
-
-
 newsApi.get("/", zValidator("query", pagingSchema), async (c) => {
   const limit = c.req.valid("query").limit;
   const offset = c.req.valid("query").offset;
@@ -18,7 +16,8 @@ newsApi.get("/", zValidator("query", pagingSchema), async (c) => {
     const news = await prisma.news.findMany({
       take: limit,
       skip: offset,
-      orderBy: {id: 'desc'}
+      orderBy: { id: "desc" },
+      where: { published: true },
     });
 
     const count = await prisma.news.count();
@@ -35,8 +34,6 @@ newsApi.get("/", zValidator("query", pagingSchema), async (c) => {
     return c.json(null, 500);
   }
 });
-
-
 
 newsApi.post("/", zValidator("json", postNewsSchema), async (c) => {
   const data = c.req.valid("json");
@@ -70,8 +67,6 @@ newsApi.post("/", zValidator("json", postNewsSchema), async (c) => {
     return c.json({ error: "Internal Server Error" }, 500);
   }
 });
-
-
 
 newsApi.get("/:slug", zValidator("param", slugSchema), async (c) => {
   const slug = c.req.valid("param").slug;
